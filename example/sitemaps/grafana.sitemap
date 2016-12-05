@@ -1,0 +1,47 @@
+sitemap grafana label="Main Menu"
+{
+	Frame label="Demo" {
+
+		Text label="Static panels" icon="pie" {
+			Frame label="Static 1" {
+				Webview url="/static/demo-static.html?dashboard=static&from=now-1y&to=now-1d&panel=111" height=9
+			}
+
+			Frame label="Static 2" {
+				Webview url="/static/demo-static.html?dashboard=motion&from=now-3h&to=now&panel=222" height=9
+			}
+
+			Frame label="Static 3" {
+				Webview url="/static/demo-static.html?dashboard=water&panel=333&theme=dark" height=9
+			}
+		}
+
+		Text label="Combining panels" icon="line" {
+			Frame label="Combo 1" {
+				Switch item=Combo1_Panel mappings=[HUMIDITY="Humidity", TEMPERATURE="Temperature"]
+				Switch item=Combo1_From mappings=[HOUR="Hour", DAY="Day", WEEK="Week", MONTH="Month", YEAR="Year"]
+				Webview url="/static/demo-combo1.html?dashboard=combo&fromItem=Combo1_From&panelItem=Combo1_Panel" height=9
+			}
+
+			Frame label="Combo 2" {
+				Switch item=Combo2_Panel mappings=[HUMIDITY="Humidity", TEMPERATURE="Temperature"]
+				Switch item=Combo2_Dashboard mappings=[alpha="Alpha", beta="Beta", gamma="Gamma", delta="Delta"]
+				Selection item=Combo2_From mappings=[HOUR="now-1h", DAY="now-1d", WEEK="now-7d", MONTH="now-30d", YEAR="now-1y"]
+				Selection item=Combo2_To mappings=[NOW="now", HOUR="now-1h", DAY="now-1d", WEEK="now-7d", MONTH="now-30d", YEAR="now-1y"]
+				Switch item=Combo2_Theme mappings=[light="Light", dark="Dark"]
+				Webview url="/static/demo-combo2.html?dashboardItem=Combo2_Dashboard&fromItem=Combo2_From&toItem=Combo2_To&panelItem=Combo2_Panel&themeItem=Combo2_Theme" height=9
+			}
+		}
+
+		Text label="Multiple panels" icon="movecontrol" {
+			Frame label="Multi 1" {
+				Switch item=Multi1_Dashboard mappings=[motion="Motion", water="Water"]
+				Switch item=Multi1_From label="Period" mappings=[1HOUR="1h", 3HOURS="3h", 6HOURS="6h", 12HOURS="12h", 1DAY="Day"]
+				Webview url="/static/demo-multi1.html?dashboardItem=Multi1_Dashboard&&fromItem=Multi1_From" height=23
+			}
+		}
+	}
+
+}
+
+// vim: syntax=Xtend syntax=openhab

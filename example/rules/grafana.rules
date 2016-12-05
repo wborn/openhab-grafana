@@ -1,0 +1,17 @@
+
+rule "Initialize values"
+when
+	System started
+then
+	Combo1_Panel.postUpdate("HUMIDITY")
+	Combo1_From.postUpdate("DAY")
+
+	Combo2_Dashboard.postUpdate("gamma")
+	Combo2_Panel.postUpdate("TEMPERATURE")
+	Combo2_From.postUpdate("YEAR")
+	Combo2_To.postUpdate("HOUR")
+	Combo2_Theme.postUpdate("light")
+
+	Multi1_Dashboard.postUpdate("motion")
+	Multi1_From.postUpdate("3HOURS")
+end

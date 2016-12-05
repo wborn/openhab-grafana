@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" CONTENT="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="panel-300px.css" />
+    <script src="smarthome-grafana.js"></script>
+    <script src="smarthome-grafana-user-defaults.js"></script>
+</head>
+
+<body>
+</body>
+
+<script>
+    var fromItemFunction = function(value) {
+        switch (value) {
+            case "HOUR": 
+                return "now-1h";
+            case "DAY":
+                return "now-1d";
+            default: 
+            case "WEEK":
+                return "now-7d";
+            case "MONTH":
+                return "now-30d";
+            case "YEAR":
+                return "now-1y";
+        }
+    }
+
+    var panelItemFunction = function(value) {
+        switch (value) {
+            case "HUMIDITY": 
+                return "1";
+            default: 
+            case "TEMPERATURE":
+                return "2";
+        }
+    }
+
+    addGrafanaPanel("combination", {
+        fromItemFunction: fromItemFunction,
+        panelItemFunction: panelItemFunction
+    });
+</script>
+
+</html> 

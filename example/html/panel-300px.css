@@ -1,0 +1,13 @@
+.panel-container iframe {
+  border: 0;
+  background-color: #efefef;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+}
+
+.panel-container {
+  width: 100%;
+  margin: 0 auto;
+}
+

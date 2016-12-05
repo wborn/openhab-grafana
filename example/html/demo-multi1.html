@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" CONTENT="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="panel-75px.css" />
+    <script src="smarthome-grafana.js"></script>
+    <script src="smarthome-grafana-user-defaults.js"></script>
+</head>
+
+<body>
+</body>
+
+<script>
+    var fromItemFunction = function(value) {
+        switch (value) {
+            case "1HOUR": 
+                return "now-1h";
+            default: 
+            case "3HOURS": 
+                return "now-3h";
+            case "6HOURS": 
+                return "now-6h";
+            case "12HOURS": 
+                return "now-12h";
+            case "1DAY":
+                return "now-1d";
+        }
+    }
+
+    for (var i = 1; i <= 10; i++) {
+        addGrafanaPanel(i, {
+            fromItemFunction: fromItemFunction,
+            panel: i
+        });
+    }
+</script>
+
+</html>

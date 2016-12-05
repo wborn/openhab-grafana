@@ -1,0 +1,427 @@
+/**
+ * SmartHome Grafana panel utilities
+ *
+ * Updates the source URL of Grafana <iframe> panels using Eclipse SmartHome server side events (SSE).
+ * SmartHomeSubscriber is based on the javascript of the Eclipse SmartHome Basic UI by Vlad Ivanov.
+ *
+ * @author Wouter Born
+ */
+
+/*exported addGrafanaPanel, GrafanaPanel*/
+/*eslint-env browser */
+/*eslint no-undef:2*/
+/*eslint no-new:0 */
+/*eslint no-underscore-dangle:0*/
+
+"use strict";
+
+var
+    SMARTHOME_GRAFANA_DEFAULTS = {
+        debug: "false",
+        sitemap: "default",
+        from: "now-1d",
+        to: "now",
+        theme: "light"
+    };
+
+function queryParams(param) {
+
+    if (!param) {
+        return {};
+    }
+
+    var
+        match,
+        url = param.toString(),
+        queryIndex = url.indexOf("?"),
+        query = queryIndex !== -1 ? url.substring(queryIndex + 1) : "",
+        re = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); },
+        result = {};
+
+    do {
+        match = re.exec(query);
+        if (match) {
+           result[decode(match[1])] = decode(match[2]);
+        }
+    } while (match);
+
+    return result;
+}
+
+var
+    urlParams = queryParams(window.location),
+    parentUrlParams = queryParams(window.parent.location.href);
+
+function resolveParam(params, name) {
+    if (params !== undefined && params[name] !== undefined) {
+        return params[name];
+    } else if (urlParams !== undefined && urlParams[name] !== undefined) {
+        return urlParams[name];
+    } else if (parentUrlParams !== undefined && parentUrlParams[name] !== undefined) {
+        return parentUrlParams[name];
+    } else {
+        return SMARTHOME_GRAFANA_DEFAULTS[name];
+    }
+}
+
+function SmartHomeSubscriber(params) {
+
+    var
+        p = params,
+        initialized = false,
+        initializedListeners = [],
+        items = {},
+        subscription = {
+            id: "",
+            page: resolveParam(p, "w"),
+            sitemap: resolveParam(p, "sitemap")
+        };
+
+    this.addItemListener = function(itemName, listener) {
+        if (typeof listener !== "function") {
+            throw new Error("addItemListener 'listener' is not a function");
+        }
+        if (items[itemName] !== undefined) {
+            items[itemName].listeners.push(listener);
+        } else {
+            items[itemName] = {listeners: [listener], value: undefined};
+        }
+    };
+
+    this.addInitializedListener = function(listener) {
+        if (typeof listener !== "function") {
+            throw new Error("addInitializedListener 'listener' is not a function");
+        }
+        initializedListeners.push(listener);
+    };
+
+    this.isInitialized = function() {
+        return initialized;
+    };
+
+    function ajax(params) {
+        var
+            p = params,
+            type = typeof p.type !== "undefined" ? p.type : "GET",
+            data = typeof p.data !== "undefined" ? p.data : "",
+            headers = typeof p.headers !== "undefined" ? p.headers : {},
+            request = new XMLHttpRequest();
+
+        request.open(type, p.url, true);
+
+        for (var h in headers) {
+            request.setRequestHeader(h, headers[h]);
+        }
+
+        request.onload = function() {
+            if (request.status < 200 || request.status > 400) {
+                if (typeof p.error === "function") {
+                    p.error(request);
+                }
+                return;
+            }
+            if (typeof p.callback === "function") {
+                p.callback(request);
+            }
+        };
+        request.onerror = function() {
+            if (typeof p.error === "function") {
+                p.error(request);
+            }
+        };
+        request.send(data);
+
+        return request;
+    }
+
+    function uninitializedItemNames() {
+        var result = [];
+        for (var itemName in items) {
+            if (items[itemName].value === undefined) {
+                result.push(itemName);
+            }
+        }
+        return result;
+    }
+
+    function areAllItemsInitialized() {
+        return uninitializedItemNames().length === 0;
+    }
+
+    function updateInitialized() {
+        if (!initialized && areAllItemsInitialized()) {
+            initialized = true;
+            for (var i = 0; i < initializedListeners.length; i++) {
+                initializedListeners[i]();
+            }
+        }
+    }
+
+    function updateItem(itemName, value) {
+
+        if (items[itemName].value === value) {
+            return;
+        }
+
+        items[itemName].value = value;
+
+        var itemListeners = items[itemName].listeners;
+        for (var i = 0; i < itemListeners.length; i++) {
+            var listener = itemListeners[i];
+            listener(itemName, value);
+        }
+
+        updateInitialized();
+    }
+
+    function ChangeListenerEventsource(subscribeLocation) {
+        var
+            _t = this;
+
+        _t.navigate = function(){};
+        _t.source = new EventSource(subscribeLocation);
+        _t.source.addEventListener("event", function(payload) {
+            if (_t.paused) {
+                return;
+            }
+
+            var
+                data = JSON.parse(payload.data),
+                itemName = data.item.name,
+                value;
+
+            if (items[itemName] === undefined) {
+                return;
+            }
+
+            if (
+                (typeof(data.label) === "string") &&
+                (data.label.indexOf("[") !== -1) &&
+                (data.label.indexOf("]") !== -1)
+            ) {
+                var
+                    pos = data.label.indexOf("[");
+
+                value = data.label.substr(
+                    pos + 1,
+                    data.label.lastIndexOf("]") - (pos + 1)
+                );
+            } else {
+                value = data.item.state;
+            }
+
+            updateItem(itemName, value);
+        });
+    }
+
+    function ChangeListener() {
+        var
+            _t = this;
+
+        _t.startSubscriber = function(response) {
+            var
+                responseJSON,
+                subscribeLocation,
+                subscribeLocationArray;
+
+            try {
+                responseJSON = JSON.parse(response.responseText);
+            } catch (e) {
+                return;
+            }
+
+            if (responseJSON.status !== "CREATED") {
+                return;
+            }
+
+            try {
+                subscribeLocation = responseJSON.context.headers.Location[0];
+            } catch (e) {
+                return;
+            }
+
+            subscribeLocationArray = subscribeLocation.split("/");
+            subscription.id = subscribeLocationArray[subscribeLocationArray.length - 1];
+
+            ChangeListenerEventsource.call(_t, subscribeLocation +
+                "?sitemap=" + subscription.sitemap +
+                "&pageid=" + subscription.page);
+        };
+
+        ajax({
+            url: "/rest/sitemaps/events/subscribe",
+            type: "POST",
+            callback: _t.startSubscriber
+        });
+    }
+
+    function ValuesInitializer() {
+        var
+            _t = this;
+
+        _t.valueHandler = function(response) {
+            var
+                responseJSON;
+
+            try {
+                responseJSON = JSON.parse(response.responseText);
+            } catch (e) {
+                return;
+            }
+
+            updateItem(responseJSON.name, responseJSON.state);
+        };
+
+        var itemNames = uninitializedItemNames();
+        for (var i = 0; i < itemNames.length; i++) {
+            ajax({
+                url: "/rest/items/" + itemNames[i],
+                type: "GET",
+                callback: _t.valueHandler
+            });
+        }
+
+        updateInitialized();
+    }
+
+    function initialize() {
+        if (subscription.page === undefined) {
+            subscription.page = subscription.sitemap;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            subscription.valuesInitializer = new ValuesInitializer();
+            subscription.changeListener = new ChangeListener();
+        });
+    }
+
+    initialize();
+}
+
+var smartHomeSubscriber = new SmartHomeSubscriber();
+
+function GrafanaPanel(params) {
+
+    var
+        p = params,
+        debug = resolveParam(p, "debug"),
+        frame = resolveParam(p, "frame"),
+        urlPrefix = resolveParam(p, "urlPrefix"),
+        urlVars = {
+            dashboard: {
+                value: resolveParam(p, "dashboard"),
+                itemName: resolveParam(p, "dashboardItem"),
+                itemFunction: params.dashboardItemFunction
+            },
+            from: {
+                key: "from",
+                value: resolveParam(p, "from"),
+                itemName: resolveParam(p, "fromItem"),
+                itemFunction: params.fromItemFunction
+            },
+            to: {
+                key: "to",
+                value: resolveParam(p, "to"),
+                itemName: resolveParam(p, "toItem"),
+                itemFunction: params.toItemFunction
+            },
+            panel: {
+                key: "panelId",
+                value: resolveParam(p, "panel"),
+                itemName: resolveParam(p, "panelItem"),
+                itemFunction: params.panelItemFunction
+            },
+            theme: {
+                key: "theme",
+                value: resolveParam(p, "theme"),
+                itemName: resolveParam(p, "themeItem"),
+                itemFunction: params.themeItemFunction
+            }
+        };
+
+    function updateFrameSourceURL() {
+        var url = urlPrefix;
+        url += urlVars.dashboard.value;
+
+        var firstParameter = true;
+        for (var uvKey in urlVars) {
+            if (urlVars[uvKey].key !== undefined) {
+                url += (firstParameter ? "?" : "&") + urlVars[uvKey].key + "=" + urlVars[uvKey].value;
+                firstParameter = false;
+            }
+        }
+
+        var iframe = document.getElementById(frame);
+
+        if (debug === "true") {
+            iframe.contentWindow.document.open();
+            iframe.contentWindow.document.write("<a href=\"" + url + "\">" + url + "</a>");
+            iframe.contentWindow.document.close();
+        } else if (document.getElementById(frame).src !== url) {
+            // replace the URL so changes are not added to the browser history
+            iframe.contentWindow.location.replace(url);
+        }
+    }
+
+    function onItemUpdated(itemName, value) {
+        for (var uvKey in urlVars) {
+            if (urlVars[uvKey].itemName !== undefined && urlVars[uvKey].itemName === itemName) {
+                if (urlVars[uvKey].itemFunction) {
+                    value = urlVars[uvKey].itemFunction(value);
+                }
+                urlVars[uvKey].value = value;
+            }
+        }
+
+        if (smartHomeSubscriber.isInitialized()) {
+            updateFrameSourceURL();
+        }
+    }
+
+    function initialize() {
+        if (frame === undefined) {
+            throw new Error("Property 'frame' is undefined");
+        }
+        if (urlPrefix === undefined) {
+            throw new Error("Property 'urlPrefix' is undefined");
+        }
+
+        for (var uvKey in urlVars) {
+            var itemName = urlVars[uvKey].itemName;
+            if (itemName !== undefined) {
+                smartHomeSubscriber.addItemListener(itemName, onItemUpdated);
+            } else if (urlVars[uvKey].value === undefined) {
+                throw new Error("URL variable '" + uvKey + "' requires a default value or itemName to obtain the value from");
+            }
+        }
+
+        smartHomeSubscriber.addInitializedListener(updateFrameSourceURL);
+    }
+
+    initialize();
+}
+
+var grafanaPanels = [];
+
+function addGrafanaPanel(uniqueId, params) {
+    var div = document.createElement("div");
+    div.id = "panel-" + uniqueId + "-container";
+    div.className = "panel-container";
+    document.body.appendChild(div);
+
+    var frame = document.createElement("iframe");
+    frame.id = "panel-" + uniqueId + "-frame";
+    frame.className = "panel-frame";
+    frame.scrolling = "no";
+    div.appendChild(frame);
+
+    if (params === undefined) {
+        params = {};
+    }
+
+    params.frame = frame.id;
+
+    var panel = new GrafanaPanel(params);
+    grafanaPanels.push(panel);
+}

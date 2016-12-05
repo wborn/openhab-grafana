@@ -1,0 +1,14 @@
+
+String Combo1_Panel		"Type"		<none>
+String Combo1_From		"Period"	<none>
+
+String Combo2_Dashboard	"Dashboard"	<none>
+String Combo2_Panel		"Type"		<none>
+String Combo2_From		"From"		<none>
+String Combo2_To		"To"		<none>
+String Combo2_Theme		"Theme"		<none>
+
+String Multi1_Dashboard	"Dashboard"	<none>
+String Multi1_From		"Period"	<none>
+
+// vim: syntax=Xtend syntax=openhab
