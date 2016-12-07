@@ -211,4 +211,4 @@ for (var i = 1; i <= 10; i++) {
 Generated panel tags all have a unique identifier that can be used for CSS styling. The identifiers are based on the first parameter of the `addGrafanaPanel` function. In this example the library generates:
 
 * `panel-1-frame`, `panel-2-frame`, ... for Grafana panel `<iframe>` tags
-* `panel-1-container`, `panel-2-container`, ... for the `<div>` tags enclosing the respectively `<iframe>` tags
+* `panel-1-container`, `panel-2-container`, ... for the `<div>` tags enclosing the corresponding `<iframe>` tags
