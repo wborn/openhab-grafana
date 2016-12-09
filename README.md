@@ -51,18 +51,23 @@ The `SmartHomeSubscriber` typically resolves its parameters from the ESH URL. Th
 | debug                 | shows the generated URL instead of the panel when set to "true"                                      |
 | frame                 | the unique identifier of the `<iframe>` tag in which the  panel is shown, e.g. "panel-123-frame" when the panel is created with `addGrafanaPanel("123")` |
 | urlPrefix             | the prefix to use for generating Grafana panel URLs, e.g. "http://grafana:3000/dashboard-solo/db/"   |
+|                       |                                                                                                      |
 | dashboard             | static definition of the Grafana dashboard name, e.g. "motion"                                       |
 | dashboardItem         | the name of the ESH item used for resolving the dashboard Grafana URL value, e.g. "Combo2_Dashboard" |
 | dashboardItemFunction | the function for mapping the `dashboardItem` value to a Grafana URL value (JavaScript only)          |
+|                       |                                                                                                      |
 | from                  | static definition of the `from=` Grafana URL value, e.g. "now-7d"                                    |
 | fromItem              | the name of the ESH item used for resolving the `from=` value, e.g. "Combo2_From"                    |
 | fromItemFunction      | the function for mapping the `fromItem` value to a Grafana URL value (JavaScript only)               |
+|                       |                                                                                                      |
 | to                    | static definition of the `to=` Grafana URL value, e.g. "now"                                         |
 | toItem                | the name of the ESH item used for resolving the `to=` value, e.g. "Combo2_To"                        |
 | toItemFunction        | the function for mapping the `toItem` value to a Grafana URL value (JavaScript only)                 |
+|                       |                                                                                                      |
 | panel                 | static definition of the `panelId=` Grafana URL value, e.g. "5"                                      |
 | panelItem             | the name of the ESH item used for resolving the `panelId=` value, e.g. "Combo2_Panel"                |
 | panelItemFunction     | the function for mapping the `panelItem` value to a Grafana URL value (JavaScript only)              |
+|                       |                                                                                                      |
 | theme                 | static definition of the `theme=` Grafana URL value, e.g. "light"                                    |
 | themeItem             | the name of the ESH item used for resolving the `theme=` value, e.g. "Combo2_Theme"                  |
 | themeItemFunction     | the function for mapping the `themeItem` value to a Grafana URL value (JavaScript only)              |
