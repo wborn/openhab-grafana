@@ -56,7 +56,7 @@ The `SmartHomeSubscriber` typically resolves its parameters from the ESH URL. Th
 | dashboardItem         | the name of the ESH item used for resolving the dashboard Grafana URL value, e.g. "Combo2_Dashboard" |
 | dashboardItemFunction | the function for mapping the `dashboardItem` value to a Grafana URL value (JavaScript only)          |
 |                       |                                                                                                      |
-| from                  | static definition of the `from=` Grafana URL value, e.g. "now-7d"                                    |
+| from                  | static definition of the `from=` Grafana URL value, e.g. "now-1w"                                    |
 | fromItem              | the name of the ESH item used for resolving the `from=` value, e.g. "Combo2_From"                    |
 | fromItemFunction      | the function for mapping the `fromItem` value to a Grafana URL value (JavaScript only)               |
 |                       |                                                                                                      |
@@ -73,7 +73,12 @@ The `SmartHomeSubscriber` typically resolves its parameters from the ESH URL. Th
 | themeItemFunction     | the function for mapping the `themeItem` value to a Grafana URL value (JavaScript only)              |
 
 
-## Building 
+## Grafana time units
+
+The Grafana [documentation](http://docs.grafana.org/reference/timerange/#time-units) has an overview with the time units that can be used with the `from=` and `to=` URL values.
+
+
+## Building
 
 Use [Grunt](http://gruntjs.com) to check the library code with eslint and minify it.
 
@@ -158,9 +163,9 @@ var fromToItemFunction = function(value) {
             return "now-1d";
         default: 
         case "WEEK":
-            return "now-7d";
+            return "now-1w";
         case "MONTH":
-            return "now-30d";
+            return "now-1M";
         case "YEAR":
             return "now-1y";
     }

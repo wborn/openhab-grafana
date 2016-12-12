@@ -26,8 +26,8 @@ sitemap grafana label="Main Menu"
 			Frame label="Combo 2" {
 				Switch item=Combo2_Panel mappings=[HUMIDITY="Humidity", TEMPERATURE="Temperature"]
 				Switch item=Combo2_Dashboard mappings=[alpha="Alpha", beta="Beta", gamma="Gamma", delta="Delta"]
-				Selection item=Combo2_From mappings=[HOUR="now-1h", DAY="now-1d", WEEK="now-7d", MONTH="now-30d", YEAR="now-1y"]
-				Selection item=Combo2_To mappings=[NOW="now", HOUR="now-1h", DAY="now-1d", WEEK="now-7d", MONTH="now-30d", YEAR="now-1y"]
+				Selection item=Combo2_From mappings=[HOUR="now-1h", DAY="now-1d", WEEK="now-1w", MONTH="now-1M", YEAR="now-1y"]
+				Selection item=Combo2_To mappings=[NOW="now", HOUR="now-1h", DAY="now-1d", WEEK="now-1w", MONTH="now-1M", YEAR="now-1y"]
 				Switch item=Combo2_Theme mappings=[light="Light", dark="Dark"]
 				Webview url="/static/demo-combo2.html?dashboardItem=Combo2_Dashboard&fromItem=Combo2_From&toItem=Combo2_To&panelItem=Combo2_Panel&themeItem=Combo2_Theme" height=9
 			}
