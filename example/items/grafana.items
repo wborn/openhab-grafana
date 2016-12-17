@@ -8,6 +8,12 @@ String Combo2_From		"From"		<none>
 String Combo2_To		"To"		<none>
 String Combo2_Theme		"Theme"		<none>
 
+String Combo3_Dashboard	"Dashboard"	<none>
+String Combo3_Panel		"Type"		<none>
+String Combo3_From		"From"		<none>
+String Combo3_To		"To"		<none>
+String Combo3_Theme		"Theme"		<none>
+
 String Multi1_Dashboard	"Dashboard"	<none>
 String Multi1_From		"Period"	<none>
 

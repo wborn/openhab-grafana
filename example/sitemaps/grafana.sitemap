@@ -31,13 +31,22 @@ sitemap grafana label="Main Menu"
 				Switch item=Combo2_Theme mappings=[light="Light", dark="Dark"]
 				Webview url="/static/demo-combo2.html?dashboardItem=Combo2_Dashboard&fromItem=Combo2_From&toItem=Combo2_To&panelItem=Combo2_Panel&themeItem=Combo2_Theme" height=9
 			}
+			
+			Frame label="Combo 3" {
+				Switch item=Combo3_Panel mappings=[1="CO", 2="Smoke", 3="UV"]
+				Switch item=Combo3_Dashboard mappings=[garage="Garage", living="Living", kitchen="Kitchen"]
+				Selection item=Combo3_From mappings=["now-1h"="One hour ago", "now-1d"="One day ago", "now-1w"="One week ago", "now-1M"="One month ago", "now-1y"="One year ago"]
+				Selection item=Combo3_To mappings=[now="Now", "now-1h"="One hour ago", "now-1d"="One day ago", "now-1w"="One week ago", "now-1M"="One month ago", "now-1y"="One year ago"]
+				Switch item=Combo3_Theme mappings=[light="Light", dark="Dark"]
+				Webview url="/static/demo-combo3.html?dashboardItem=Combo3_Dashboard&fromItem=Combo3_From&toItem=Combo3_To&panelItem=Combo3_Panel&themeItem=Combo3_Theme" height=9
+			}
 		}
 
 		Text label="Multiple panels" icon="movecontrol" {
 			Frame label="Multi 1" {
 				Switch item=Multi1_Dashboard mappings=[motion="Motion", water="Water"]
-				Switch item=Multi1_From label="Period" mappings=[1HOUR="1h", 3HOURS="3h", 6HOURS="6h", 12HOURS="12h", 1DAY="Day"]
-				Webview url="/static/demo-multi1.html?dashboardItem=Multi1_Dashboard&&fromItem=Multi1_From" height=23
+				Switch item=Multi1_From label="Period" mappings=["now-1h"="1h", "now-3h"="3h", "now-6h"="6h", "now-12h"="12h", "now-1d"="Day"]
+				Webview url="/static/demo-multi1.html?dashboardItem=Multi1_Dashboard&fromItem=Multi1_From" height=23
 			}
 		}
 	}

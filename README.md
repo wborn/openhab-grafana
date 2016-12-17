@@ -188,31 +188,16 @@ addGrafanaPanel("combination", {
 });
 ```
 
+*Combo 3* shows how to completely work without JavaScript functions for mapping item values to URL values. This can be done by using the Grafana URL values with double quotes `"` in the [grafana.sitemap](example/sitemaps/grafana.sitemap) mappings. This also allows for reusing the same HTML page ([demo-combo3.html](example/html/demo-combo3.html)) for a lot of `Webview`s.
+
 
 ### Multiple panels
 
 This page shows how a JavaScript for loop is used to show several panels of the same dashboard in the same `Webview`. The panel numbers are calculated and added in [demo-multi1.html](example/html/demo-multi1.html) as follows:
 
 ```javascript
-var fromItemFunction = function(value) {
-    switch (value) {
-        case "1HOUR": 
-            return "now-1h";
-        default: 
-        case "3HOURS": 
-            return "now-3h";
-        case "6HOURS": 
-            return "now-6h";
-        case "12HOURS": 
-            return "now-12h";
-        case "1DAY":
-            return "now-1d";
-    }
-}
-
 for (var i = 1; i <= 10; i++) {
     addGrafanaPanel(i, {
-        fromItemFunction: fromItemFunction,
         panel: i
     });
 }

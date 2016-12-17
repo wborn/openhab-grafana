@@ -12,6 +12,12 @@ then
 	Combo2_To.postUpdate("HOUR")
 	Combo2_Theme.postUpdate("light")
 
+	Combo3_Dashboard.postUpdate("living")
+	Combo3_Panel.postUpdate(2)
+	Combo3_From.postUpdate("now-1M")
+	Combo3_To.postUpdate("now")
+	Combo3_Theme.postUpdate("dark")
+
 	Multi1_Dashboard.postUpdate("motion")
-	Multi1_From.postUpdate("3HOURS")
+	Multi1_From.postUpdate("now-3h")
 end
