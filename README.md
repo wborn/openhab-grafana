@@ -83,15 +83,15 @@ The `SmartHomeSubscriber` typically resolves its parameters from the ESH URL. Th
 |                       |                                                                                                      |
 | width                 | static definition of the `width=` Grafana URL value, e.g. "1000" (only used when render is "true", use `width=auto` to use the width of the frame |
 | widthItem             | the name of the ESH item used for resolving the `width=` value, e.g. "Render2_Width"                 |
-| widthItemFunction     | the function for mapping the `widthItem` value to a value (JavaScript only)                          |
+| widthItemFunction     | the function for mapping the `widthItem` value to a number or "auto" (JavaScript only)                          |
 |                       |                                                                                                      |
 | height                | static definition of the `height=` Grafana URL value, e.g. "300" (only used when render is "true", use `height=auto` to use the height of the frame |
 | heightItem            | the name of the ESH item used for resolving the `height=` value, e.g. "Render2_Height"               |
-| heightItemFunction    | the function for mapping the `heightItem` value to a value (JavaScript only)                         |
+| heightItemFunction    | the function for mapping the `heightItem` value to a number or "auto" (JavaScript only)                         |
 |                       |                                                                                                      |
 | refresh               | static definition of the refresh interval for a rendered panel in milliseconds, e.g. "60000" for refreshing every minute, use "0" to disable |
 | refreshItem           | the name of the ESH item used for resolving the refresh value, e.g. "Render2_Refresh"                |
-| refreshItemFunction   | the function for mapping the `refreshItem` value to a value (JavaScript only)                        |
+| refreshItemFunction   | the function for mapping the `refreshItem` value to a number (JavaScript only)                        |
 
 
 ## Grafana time units
