@@ -236,7 +236,7 @@ Generated panel tags all have a unique identifier that can be used for CSS styli
 
 ### Rendered panels
 
-This page shows how the library is used to generate URLs for rendered Grafana panels. *Render 1* again uses ([demo.html](example/html/demo.html)) and uses a static parameter definition for the `Webview` URL in [grafana.sitemap](example/sitemaps/grafana.sitemap):
+This page shows how the library is used to generate URLs for rendered Grafana panels. *Render 1* again uses [demo.html](example/html/demo.html) and a static parameter definition for the `Webview` URL in [grafana.sitemap](example/sitemaps/grafana.sitemap):
 
 ```javascript
 Webview url="/static/demo.html?dashboard=wifireception&from=now-1w&to=now&panel=10&width=600&height=300&render=true&refresh=5000" height=9
