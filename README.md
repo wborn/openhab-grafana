@@ -242,6 +242,6 @@ This page shows how the library is used to generate URLs for rendered Grafana pa
 Webview url="/static/demo.html?dashboard=wifireception&from=now-1w&to=now&panel=10&width=600&height=300&render=true&refresh=5000" height=9
 ```
 
-A rendered panel image is used when the URL contains `render=true`. To let the library calculate the width and height of a panel use `width=auto` and `height=auto`. It will then use then use the width and height of the frame for the Grafana URL values. The `refresh=5000` URL parameter makes the library reload the Grafana panel image every 5 seconds. Refresh can be disabled by omitting the value or by using `refresh=0`.
+A rendered panel image is used when the URL contains `render=true`. To let the library calculate the width and height of a panel use `width=auto` and `height=auto`. It will then use the width and height of the frame for the Grafana URL values. The `refresh=5000` URL parameter makes the library reload the Grafana panel image every 5 seconds. Refresh can be disabled by omitting the value or by using `refresh=0`.
 
 *Render 2* shows how ESH item values can be used for customizing the render, width, height and  refresh parameters.
