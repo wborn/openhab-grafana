@@ -48,9 +48,14 @@ The `SmartHomeSubscriber` typically resolves its parameters from the ESH URL. Th
 
 | Parameter name        | Comment                                                                                              |
 |-----------------------|------------------------------------------------------------------------------------------------------|
+| frame                 | the unique identifier of the `<iframe>` tag in which the panel is shown, e.g. "panel-123-frame" when the panel is created with `addGrafanaPanel("123")` |
+| urlPrefix             | the prefix to use for generating Grafana panel URLs, e.g. "http://grafana:3000"                      |
+| panelPath             | the panel path in Grafana panel URLs, e.g. "/dashboard-solo/db/"                                     |
+| renderPanelPath       | the rendered path in Grafana panel URLs, e.g. "/render/dashboard-solo/db/"                           |
+|                       |                                                                                                      |
 | debug                 | shows the generated URL instead of the panel when set to "true"                                      |
-| frame                 | the unique identifier of the `<iframe>` tag in which the  panel is shown, e.g. "panel-123-frame" when the panel is created with `addGrafanaPanel("123")` |
-| urlPrefix             | the prefix to use for generating Grafana panel URLs, e.g. "http://grafana:3000/dashboard-solo/db/"   |
+| debugItem             | the name of the ESH item used for resolving the debug value, e.g. "Combo2_Debug"                     |
+| debugItemFunction     | the function for mapping the `debugItem` value to "true" or "false" (JavaScript only)                |
 |                       |                                                                                                      |
 | dashboard             | static definition of the Grafana dashboard name, e.g. "motion"                                       |
 | dashboardItem         | the name of the ESH item used for resolving the dashboard Grafana URL value, e.g. "Combo2_Dashboard" |
@@ -71,6 +76,22 @@ The `SmartHomeSubscriber` typically resolves its parameters from the ESH URL. Th
 | theme                 | static definition of the `theme=` Grafana URL value, e.g. "light"                                    |
 | themeItem             | the name of the ESH item used for resolving the `theme=` value, e.g. "Combo2_Theme"                  |
 | themeItemFunction     | the function for mapping the `themeItem` value to a Grafana URL value (JavaScript only)              |
+|                       |                                                                                                      |
+| render                | makes Grafana render an image of the panel, use "true" or "false", when set to "true" the width, height and refresh parameters are used |
+| renderItem            | the name of the ESH item used for resolving the render value, e.g. "Render2_Render"                  |
+| renderItemFunction    | the function for mapping the `renderItem` value to "true" or "false" (JavaScript only)               |
+|                       |                                                                                                      |
+| width                 | static definition of the `width=` Grafana URL value, e.g. "1000" (only used when render is "true", use `width=auto` to use the width of the frame |
+| widthItem             | the name of the ESH item used for resolving the `width=` value, e.g. "Render2_Width"                 |
+| widthItemFunction     | the function for mapping the `widthItem` value to a value (JavaScript only)                          |
+|                       |                                                                                                      |
+| height                | static definition of the `height=` Grafana URL value, e.g. "300" (only used when render is "true", use `height=auto` to use the height of the frame |
+| heightItem            | the name of the ESH item used for resolving the `height=` value, e.g. "Render2_Height"               |
+| heightItemFunction    | the function for mapping the `heightItem` value to a value (JavaScript only)                         |
+|                       |                                                                                                      |
+| refresh               | static definition of the refresh interval for a rendered panel in milliseconds, e.g. "60000" for refreshing every minute, use "0" to disable |
+| refreshItem           | the name of the ESH item used for resolving the refresh value, e.g. "Render2_Refresh"                |
+| refreshItemFunction   | the function for mapping the `refreshItem` value to a value (JavaScript only)                        |
 
 
 ## Grafana time units
@@ -97,19 +118,24 @@ To run the demo:
 
 Click on a thumbnail below to zoom in on a demo page.
 
-| Main Menu                                        | Static panels                                       |
-|--------------------------------------------------|-----------------------------------------------------|
-|[![Main](doc/main-thumbnail.png)](doc/main.png)   |[![Static](doc/static-thumbnail.png)](doc/static.png)|
+| Main menu                                             | 
+|-------------------------------------------------------|
+| [![Main](doc/main-thumbnail.png)](doc/main.png)       |
 
 
-| Combining panels                                 | Multiple panels                                     |
-|--------------------------------------------------|-----------------------------------------------------|
-|[![Combo](doc/combo-thumbnail.png)](doc/combo.png)|[![Multi](doc/multi-thumbnail.png)](doc/multi.png)   |
+| Static panels                                         | Combining panels                                      |
+|-------------------------------------------------------|-------------------------------------------------------|
+| [![Static](doc/static-thumbnail.png)](doc/static.png) | [![Combo](doc/combo-thumbnail.png)](doc/combo.png)    |
+
+
+| Multiple panels                                       | Rendered panels                                       |
+|-------------------------------------------------------|-------------------------------------------------------|
+| [![Multi](doc/multi-thumbnail.png)](doc/multi.png)    | [![Render](doc/render-thumbnail.png)](doc/render.png) |
 
 
 ### Static panels
 
-These three panels are created using the same [demo-static.html](example/html/demo-static.html) file:
+These three panels are created using the same [demo.html](example/html/demo.html) file:
 
 ```html
 <!DOCTYPE html>
@@ -125,7 +151,7 @@ These three panels are created using the same [demo-static.html](example/html/de
 </body>
 
 <script>
-    addGrafanaPanel("static");
+    addGrafanaPanel();
 </script>
 
 </html>
@@ -188,7 +214,7 @@ addGrafanaPanel("combination", {
 });
 ```
 
-*Combo 3* shows how to completely work without JavaScript functions for mapping item values to URL values. This can be done by using the Grafana URL values with double quotes `"` in the [grafana.sitemap](example/sitemaps/grafana.sitemap) mappings. This also allows for reusing the same HTML page ([demo-combo3.html](example/html/demo-combo3.html)) for a lot of `Webview`s.
+*Combo 3* shows how to completely work without JavaScript functions for mapping item values to URL values. This can be done by using the Grafana URL values with double quotes `"` in the [grafana.sitemap](example/sitemaps/grafana.sitemap) mappings. This also allows for reusing the same HTML page ([demo.html](example/html/demo.html)) for a lot of `Webview`s.
 
 
 ### Multiple panels
@@ -207,3 +233,15 @@ Generated panel tags all have a unique identifier that can be used for CSS styli
 
 * `panel-1-frame`, `panel-2-frame`, ... for Grafana panel `<iframe>` tags
 * `panel-1-container`, `panel-2-container`, ... for the `<div>` tags enclosing the corresponding `<iframe>` tags
+
+### Rendered panels
+
+This page shows how the library is used to generate URLs for rendered Grafana panels. *Render 1* again uses ([demo.html](example/html/demo.html)) and uses a static parameter definition for the `Webview` URL in [grafana.sitemap](example/sitemaps/grafana.sitemap):
+
+```javascript
+Webview url="/static/demo.html?dashboard=wifireception&from=now-1w&to=now&panel=10&width=600&height=300&render=true&refresh=5000" height=9
+```
+
+A rendered panel image is used when the URL contains `render=true`. To let the library calculate the width and height of a panel use `width=auto` and `height=auto`. It will then use then use the width and height of the frame for the Grafana URL values. The `refresh=5000` URL parameter makes the library reload the Grafana panel image every 5 seconds. Refresh can be disabled by omitting the value or by using `refresh=0`.
+
+*Render 2* shows how ESH item values can be used for customizing the render, width, height and  refresh parameters.
