@@ -317,11 +317,12 @@ function GrafanaPanel(params) {
 
     var
         p = params,
+        refreshTimerId = undefined,
+        resizeTimerId = undefined,
         frame = resolveParam(p, "frame"),
         urlPrefix = resolveParam(p, "urlPrefix"),
         panelPath = resolveParam(p, "panelPath"),
         renderPanelPath = resolveParam(p, "renderPanelPath"),
-        refreshTimerId = undefined,
         libVars = {
             debug: {
                 value: resolveParam(p, "debug"),
@@ -434,20 +435,19 @@ function GrafanaPanel(params) {
 
         // schedule/cancel rendered image refresh
         if (render === "true" && refresh > 0) {
-            if (refreshTimerId !== undefined) {
-                clearTimeout(refreshTimerId);
-            }
+            clearTimeout(refreshTimerId);
             refreshTimerId = setTimeout(updateFrameSourceURL, refresh);
         } else if (refreshTimerId !== undefined) {
             clearTimeout(refreshTimerId);
-            refreshTimerId = undefined;
         }
+    }
 
-        // update rendered image when frame is resized
-        if (render === "true" && (urlVars.width.value === "auto" || urlVars.height.value === "auto")) {
-            idocument.body.onresize = updateFrameSourceURL;
+    function updateFrameOnResize() {
+        if (libVars.render.value === "true" && (urlVars.width.value === "auto" || urlVars.height.value === "auto")) {
+            clearTimeout(resizeTimerId);
+            resizeTimerId = setTimeout(updateFrameSourceURL, 500);
         } else {
-            idocument.body.onresize = undefined;
+            clearTimeout(resizeTimerId);
         }
     }
 
@@ -498,6 +498,7 @@ function GrafanaPanel(params) {
         assertVarsDefinedOrSubscribeToESH(urlVars);
 
         smartHomeSubscriber.addInitializedListener(updateFrameSourceURL);
+        window.addEventListener("resize", updateFrameOnResize);
     }
 
     initialize();
