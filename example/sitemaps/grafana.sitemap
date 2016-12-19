@@ -1,18 +1,18 @@
-sitemap grafana label="Main Menu"
+sitemap grafana label="Grafana examples"
 {
-	Frame label="Demo" {
+	Frame label="Categories" {
 
 		Text label="Static panels" icon="pie" {
 			Frame label="Static 1" {
-				Webview url="/static/demo-static.html?dashboard=static&from=now-1y&to=now-1d&panel=111" height=9
+				Webview url="/static/demo.html?dashboard=static&from=now-1y&to=now-1d&panel=111" height=9
 			}
 
 			Frame label="Static 2" {
-				Webview url="/static/demo-static.html?dashboard=motion&from=now-3h&to=now&panel=222" height=9
+				Webview url="/static/demo.html?dashboard=motion&from=now-3h&to=now&panel=222" height=9
 			}
 
 			Frame label="Static 3" {
-				Webview url="/static/demo-static.html?dashboard=water&panel=333&theme=dark" height=9
+				Webview url="/static/demo.html?dashboard=water&panel=333&theme=dark" height=9
 			}
 		}
 
@@ -38,7 +38,7 @@ sitemap grafana label="Main Menu"
 				Selection item=Combo3_From mappings=["now-1h"="One hour ago", "now-1d"="One day ago", "now-1w"="One week ago", "now-1M"="One month ago", "now-1y"="One year ago"]
 				Selection item=Combo3_To mappings=[now="Now", "now-1h"="One hour ago", "now-1d"="One day ago", "now-1w"="One week ago", "now-1M"="One month ago", "now-1y"="One year ago"]
 				Switch item=Combo3_Theme mappings=[light="Light", dark="Dark"]
-				Webview url="/static/demo-combo3.html?dashboardItem=Combo3_Dashboard&fromItem=Combo3_From&toItem=Combo3_To&panelItem=Combo3_Panel&themeItem=Combo3_Theme" height=9
+				Webview url="/static/demo.html?dashboardItem=Combo3_Dashboard&fromItem=Combo3_From&toItem=Combo3_To&panelItem=Combo3_Panel&themeItem=Combo3_Theme" height=9
 			}
 		}
 
@@ -47,6 +47,22 @@ sitemap grafana label="Main Menu"
 				Switch item=Multi1_Dashboard mappings=[motion="Motion", water="Water"]
 				Switch item=Multi1_From label="Period" mappings=["now-1h"="1h", "now-3h"="3h", "now-6h"="6h", "now-12h"="12h", "now-1d"="Day"]
 				Webview url="/static/demo-multi1.html?dashboardItem=Multi1_Dashboard&fromItem=Multi1_From" height=23
+			}
+		}
+
+		Text label="Rendered panels" icon="video" {
+			Frame label="Render 1" {
+				Webview url="/static/demo.html?dashboard=wifireception&from=now-1w&to=now&panel=10&width=600&height=300&render=true&refresh=5000" height=9
+			}
+
+			Frame label="Render 2" {
+				Switch item=Render2_Dashboard mappings=[desktop="Desktop", nas="NAS", raspberrypi="Raspberry Pi"]
+				Switch item=Render2_Panel mappings=[1="CPU", 2="Memory", 3="Storage", 4="Speedtest"]
+				Switch item=Render2_Width mappings=[200="200",600="600",1000="1000", auto="Auto"]
+				Switch item=Render2_Height mappings=[100="100",200="200",400="400", auto="Auto"]
+				Switch item=Render2_Render mappings=[false="False", true="True"]
+				Selection item=Render2_Refresh mappings=[0="Off", 1000="1 second", 5000="5 seconds", 15000="15 seconds", 60000="1 minute", 300000="5 minutes", 900000="15 minutes", 3600000="1 hour"]
+				Webview url="/static/demo.html?dashboard=network&dashboardItem=Render2_Dashboard&from=now-1d&to=now&panelItem=Render2_Panel&widthItem=Render2_Width&heightItem=Render2_Height&renderItem=Render2_Render&refreshItem=Render2_Refresh" height=9
 			}
 		}
 	}

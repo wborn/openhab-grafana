@@ -7,21 +7,33 @@
  * @author Wouter Born
  */
 
-/*exported addGrafanaPanel, GrafanaPanel*/
-/*eslint-env browser */
-/*eslint no-undef:2*/
-/*eslint no-new:0 */
-/*eslint no-underscore-dangle:0*/
+/* exported addGrafanaPanel, GrafanaPanel */
+/* eslint-env browser */
+/* eslint no-undef:2 */
+/* eslint no-new:0 */
+/* eslint no-underscore-dangle:0 */
 
 "use strict";
 
 var
     SMARTHOME_GRAFANA_DEFAULTS = {
+        // library
         debug: "false",
+        render: "false",
+        refresh: "0",
+        // ESH sitemap
         sitemap: "default",
+        // Grafana URL
+        urlPrefix: "http://grafana:3000",
+        panelPath: "/dashboard-solo/db/",
+        renderPanelPath: "/render/dashboard-solo/db/",
+        // Grafana panel parameters
         from: "now-1d",
         to: "now",
-        theme: "light"
+        theme: "light",
+        // Grafana render panel parameters
+        width: "auto",
+        height: "auto"
     };
 
 function queryParams(param) {
@@ -305,9 +317,29 @@ function GrafanaPanel(params) {
 
     var
         p = params,
-        debug = resolveParam(p, "debug"),
+        refreshTimerId = undefined,
+        resizeTimerId = undefined,
         frame = resolveParam(p, "frame"),
         urlPrefix = resolveParam(p, "urlPrefix"),
+        panelPath = resolveParam(p, "panelPath"),
+        renderPanelPath = resolveParam(p, "renderPanelPath"),
+        libVars = {
+            debug: {
+                value: resolveParam(p, "debug"),
+                itemName: resolveParam(p, "debugItem"),
+                itemFunction: params.debugItemFunction
+            },
+            render: {
+                value: resolveParam(p, "render"),
+                itemName: resolveParam(p, "renderItem"),
+                itemFunction: params.renderItemFunction
+            },
+            refresh: {
+                value: resolveParam(p, "refresh"),
+                itemName: resolveParam(p, "refreshItem"),
+                itemFunction: params.refreshItemFunction
+            }
+        },
         urlVars = {
             dashboard: {
                 value: resolveParam(p, "dashboard"),
@@ -337,66 +369,136 @@ function GrafanaPanel(params) {
                 value: resolveParam(p, "theme"),
                 itemName: resolveParam(p, "themeItem"),
                 itemFunction: params.themeItemFunction
+            },
+            width: {
+                key: "width",
+                value: resolveParam(p, "width"),
+                itemName: resolveParam(p, "widthItem"),
+                itemFunction: params.widthItemFunction
+            },
+            height: {
+                key: "height",
+                value: resolveParam(p, "height"),
+                itemName: resolveParam(p, "heightItem"),
+                itemFunction: params.heightItemFunction
             }
         };
 
     function updateFrameSourceURL() {
+        var debug = libVars.debug.value;
+        var render = libVars.render.value;
+        var refresh = libVars.refresh.value;
+
+        var iframe = document.getElementById(frame);
+        var idocument = iframe.contentWindow.document;
+
         var url = urlPrefix;
+        url += render === "true" ? renderPanelPath : panelPath;
         url += urlVars.dashboard.value;
 
         var firstParameter = true;
         for (var uvKey in urlVars) {
-            if (urlVars[uvKey].key !== undefined) {
-                url += (firstParameter ? "?" : "&") + urlVars[uvKey].key + "=" + urlVars[uvKey].value;
+            var key = urlVars[uvKey].key;
+            var value = urlVars[uvKey].value;
+
+            if (key === "width") {
+                value = render === "false" ? undefined : (value === "auto" ? idocument.body.clientWidth : value);
+            } else if (key === "height") {
+                value = render === "false" ? undefined : (value === "auto" ? idocument.body.clientHeight : value);
+            }
+
+            if (key !== undefined && value !== undefined) {
+                url += (firstParameter ? "?" : "&") + key + "=" + value;
                 firstParameter = false;
             }
         }
 
-        var iframe = document.getElementById(frame);
-
+        if (render === "true") {
+            // append cache busting parameter
+            url += "&cacheBuster=" + Date.now();
+        }
+        // update frame content
         if (debug === "true") {
-            iframe.contentWindow.document.open();
-            iframe.contentWindow.document.write("<a href=\"" + url + "\">" + url + "</a>");
-            iframe.contentWindow.document.close();
+            idocument.open();
+            idocument.write("<a href=\"" + url + "\">" + url + "</a>");
+            idocument.close();
+        } else if (render === "true") {
+            var htmlUrl = url.replace(renderPanelPath, panelPath);
+            idocument.open();
+            idocument.write("<style>body{margin:0px}p{margin:0px}</style>");
+            idocument.write("<p style=\"text-align:center;\"><a href=\"" + htmlUrl + "\"><img src=\"" + url + "\"></a></p>");
+            idocument.close();
         } else if (document.getElementById(frame).src !== url) {
             // replace the URL so changes are not added to the browser history
             iframe.contentWindow.location.replace(url);
         }
+
+        // schedule/cancel rendered image refresh
+        if (render === "true" && refresh > 0) {
+            clearTimeout(refreshTimerId);
+            refreshTimerId = setTimeout(updateFrameSourceURL, refresh);
+        } else if (refreshTimerId !== undefined) {
+            clearTimeout(refreshTimerId);
+        }
+    }
+
+    function updateFrameOnResize() {
+        if (libVars.render.value === "true" && (urlVars.width.value === "auto" || urlVars.height.value === "auto")) {
+            clearTimeout(resizeTimerId);
+            resizeTimerId = setTimeout(updateFrameSourceURL, 500);
+        } else {
+            clearTimeout(resizeTimerId);
+        }
+    }
+
+    function updateVarsOnItemUpdate(vars, itemName, value) {
+        for (var key in vars) {
+            if (vars[key].itemName !== undefined && vars[key].itemName === itemName) {
+                if (vars[key].itemFunction) {
+                    value = vars[key].itemFunction(value);
+                }
+                vars[key].value = value;
+            }
+        }
     }
 
     function onItemUpdated(itemName, value) {
-        for (var uvKey in urlVars) {
-            if (urlVars[uvKey].itemName !== undefined && urlVars[uvKey].itemName === itemName) {
-                if (urlVars[uvKey].itemFunction) {
-                    value = urlVars[uvKey].itemFunction(value);
-                }
-                urlVars[uvKey].value = value;
-            }
-        }
+        updateVarsOnItemUpdate(libVars, itemName, value);
+        updateVarsOnItemUpdate(urlVars, itemName, value);
 
         if (smartHomeSubscriber.isInitialized()) {
             updateFrameSourceURL();
         }
     }
 
-    function initialize() {
-        if (frame === undefined) {
-            throw new Error("Property 'frame' is undefined");
+    function assertPropertyDefined(name, value) {
+        if (value === undefined) {
+            throw new Error("Property '" + name + "' is undefined");
         }
-        if (urlPrefix === undefined) {
-            throw new Error("Property 'urlPrefix' is undefined");
-        }
+    }
 
-        for (var uvKey in urlVars) {
-            var itemName = urlVars[uvKey].itemName;
+    function assertVarsDefinedOrSubscribeToESH(vars) {
+        for (var key in vars) {
+            var itemName = vars[key].itemName;
             if (itemName !== undefined) {
                 smartHomeSubscriber.addItemListener(itemName, onItemUpdated);
-            } else if (urlVars[uvKey].value === undefined) {
-                throw new Error("URL variable '" + uvKey + "' requires a default value or itemName to obtain the value from");
+            } else if (vars[key].value === undefined) {
+                throw new Error("Property '" + key + "' requires a default value or itemName to obtain the value from");
             }
         }
+    }
+
+    function initialize() {
+        assertPropertyDefined("frame", frame);
+        assertPropertyDefined("urlPrefix", urlPrefix);
+        assertPropertyDefined("panelPath", panelPath);
+        assertPropertyDefined("renderPanelPath", renderPanelPath);
+
+        assertVarsDefinedOrSubscribeToESH(libVars);
+        assertVarsDefinedOrSubscribeToESH(urlVars);
 
         smartHomeSubscriber.addInitializedListener(updateFrameSourceURL);
+        window.addEventListener("resize", updateFrameOnResize);
     }
 
     initialize();
@@ -404,7 +506,19 @@ function GrafanaPanel(params) {
 
 var grafanaPanels = [];
 
+function createGuid()
+{
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c === "x" ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
+}
+
 function addGrafanaPanel(uniqueId, params) {
+    if (uniqueId === undefined) {
+        uniqueId = createGuid();
+    }
+
     var div = document.createElement("div");
     div.id = "panel-" + uniqueId + "-container";
     div.className = "panel-container";

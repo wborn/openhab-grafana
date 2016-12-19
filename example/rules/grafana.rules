@@ -20,4 +20,13 @@ then
 
 	Multi1_Dashboard.postUpdate("motion")
 	Multi1_From.postUpdate("now-3h")
+
+	Render2_Dashboard.postUpdate("raspberrypi")
+	Render2_Panel.postUpdate(1)
+	Render2_Width.postUpdate("auto")
+	Render2_Height.postUpdate("200")
+	Render2_Render.postUpdate("true")
+	Render2_Refresh.postUpdate(5000)
 end
+
+// vim: syntax=Xtend syntax=openhab
