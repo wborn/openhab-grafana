@@ -227,6 +227,68 @@ function SmartHomeSubscriber(params) {
         });
     }
 
+    function ChangeListenerLongpolling() {
+
+        var
+            _t = this;
+
+        function applyChanges(response) {
+            try {
+                response = JSON.parse(response);
+            } catch (e) {
+                return;
+            }
+
+            function walkWidgets(widgets) {
+                widgets.forEach(function(widget) {
+                    if (widget.item === undefined) {
+                        return;
+                    }
+
+                    var
+                        itemName = widget.item.name,
+                        value = widget.item.state;
+
+                    if (items[itemName] !== undefined) {
+                        updateItem(itemName, value);
+                    }
+                });
+            }
+
+            if (response.leaf) {
+                walkWidgets(response.widgets);
+            } else {
+                response.widgets.forEach(function(frameWidget) {
+                    walkWidgets(frameWidget.widgets);
+                });
+            }
+        }
+
+        function start() {
+            var
+                cacheSupression = Math.random().toString(16).slice(2);
+
+            _t.request = ajax({
+                url: "/rest/sitemaps/" + subscription.sitemap + "/" + subscription.page + "?_=" + cacheSupression,
+                headers: {"X-Atmosphere-Transport": "long-polling"},
+                callback: function(request) {
+                    applyChanges(request.responseText);
+                    setTimeout(function() {
+                        start();
+                    }, 1);
+                },
+                error: function() {
+                    // Wait 1s and restart long-polling
+                    setTimeout(function() {
+                        start();
+                    }, 1000);
+                }
+            });
+        }
+
+        start();
+    }
+
     function ChangeListener() {
         var
             _t = this;
@@ -256,9 +318,13 @@ function SmartHomeSubscriber(params) {
             subscribeLocationArray = subscribeLocation.split("/");
             subscription.id = subscribeLocationArray[subscribeLocationArray.length - 1];
 
-            ChangeListenerEventsource.call(_t, subscribeLocation +
-                "?sitemap=" + subscription.sitemap +
-                "&pageid=" + subscription.page);
+            if ("EventSource" in window) {
+                ChangeListenerEventsource.call(_t, subscribeLocation +
+                    "?sitemap=" + subscription.sitemap +
+                    "&pageid=" + subscription.page);
+            } else {
+                ChangeListenerLongpolling.call(_t);
+            }
         };
 
         ajax({
