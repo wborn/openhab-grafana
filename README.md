@@ -4,7 +4,7 @@ This project provides a JavaScript library with examples to simplify embedding [
 
 The library provides the following functionality:
 
-* Generation of Grafana embedded panel URL parameters based on the state of ESH items (using REST and subscribing to server side events (SSE))
+* Generation of Grafana embedded panel URL parameters based on the state of ESH items (using REST and subscribing to [Server-sent events (SSE)](https://en.wikipedia.org/wiki/Server-sent_events))
 * Smart parameter resolution (more on that later)
 * Debug mode for debugging URL generation
 
@@ -13,8 +13,9 @@ This functionality solves the issue of having to create a `Webview` with a `visi
 
 ## Requirements
 
-* Eclipse SmartHome installation, e.g. follow: http://docs.openhab.org/installation/index.html
+* Eclipse SmartHome (ESH) installation, e.g. follow: http://docs.openhab.org/installation/index.html
 * Grafana installation/configuration, e.g. follow: https://community.openhab.org/t/influxdb-grafana-persistence-and-graphing/13761
+* **ESH and Grafana accessible via the same host/port to prevent [Same-origin policy](https://en.wikipedia.org/wiki/Same-origin_policy) violations.** E.g. setup a reverse proxy using the [configuration examples](#reverse-proxy-configuration) below.
 
 
 ## Library objects, their parameters and how they are resolved
@@ -245,3 +246,128 @@ Webview url="/static/demo.html?dashboard=wifireception&from=now-1w&to=now&panel=
 A rendered panel image is used when the URL contains `render=true`. To let the library calculate the width and height of a panel use `width=auto` and `height=auto`. It will then use the width and height of the frame for the Grafana URL values. The `refresh=5000` URL parameter makes the library reload the Grafana panel image every 5 seconds. Refresh can be disabled by omitting the value or by using `refresh=0`.
 
 *Render 2* shows how ESH item values can be used for customizing the render, width, height and  refresh parameters.
+
+
+## Reverse proxy configuration
+
+When the Grafana panels do not properly update this is most likely caused by 
+[Same-origin policy](https://en.wikipedia.org/wiki/Same-origin_policy) violations. These can be resolved by for instance configuring a reverse proxy on the same host/port that proxies traffic to ESH/openHAB and Grafana. 
+
+With the Apache2 and Nginx examples below Grafana will be accessible on `/grafana`, `htpasswd` is used for access control and SSL certificates for encrypting the data. See also the [openHAB Security Documentation](https://docs.openhab.org/installation/security.html) for information on this subject. 
+
+Because Grafana runs on another port/URL with this reverse proxy setup don't forget to update the URL in [smarthome-grafana-user-defaults.js](example/html/smarthome-grafana-user-defaults.js) to something like the line below (where `hostname` is the IP/host you use in your browser): 
+
+```javascript
+SMARTHOME_GRAFANA_DEFAULTS["urlPrefix"] = "https://hostname/grafana";
+```
+
+Grafana will also need to be reconfigured to use `/grafana` as root URL. This is done by updating the root_url in grafana.ini (in `/etc/grafana`) to the configuration below and then restarting Grafana.
+
+```
+# The full public facing url you use in browser, used for redirects and emails
+# If you use reverse proxy and sub path specify full url (with sub path)
+root_url = %(protocol)s://%(domain)s/grafana/
+```
+
+The following sections contain configuration examples for Apache2 and Nginx. After editing your configuration make sure to restart the Apache2 or Nginx to reload the configuration. You should then be able to access both ESH/openHAB and Grafana via HTTPS on the same port in your browser using the reverse proxy (port 443 instead of 8080).
+
+If you still run into any issues with this you can:
+
+* Check your browser debug console (F12) for any errors
+* Check the Grafana log file for any errors (`/var/log/grafana/grafana.log`)
+* Restart ESH/openHAB, in the past there have been issues where newly added sitemap items were not properly updated in UIs
+* Read the comments in [this issue](https://github.com/wborn/smarthome-grafana/issues/5) which also contains some example error messages that are caused by Same-origin policy violations  
+
+### Apache2
+
+With Apache2 you can create an enabled site with the configuration below. In Debian based distributions (Ubuntu, openHABian, Raspbian) the enabled sites are usually stored in `/etc/apache2/sites-enabled`.
+
+```
+SSLStaplingCache shmcb:/tmp/stapling_cache(128000)
+
+<VirtualHost _default_:443>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/html
+
+    RequestHeader set X-Forwarded-Proto "https"
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    SSLEngine on
+    SSLCertificateFile      /etc/ssl-certs/domain.com/cert.pem
+    SSLCertificateKeyFile   /etc/ssl-certs/domain.com/privkey.pem
+    SSLCertificateChainFile /etc/ssl-certs/domain.com/chain.pem
+    SSLUseStapling on
+
+    RewriteEngine On
+
+    <FilesMatch "\.(cgi|shtml|phtml|php)$">
+            SSLOptions +StdEnvVars
+    </FilesMatch>
+    <Directory /usr/lib/cgi-bin>
+            SSLOptions +StdEnvVars
+    </Directory>
+
+    <Location "/">
+        AuthType Basic
+        AuthName "Authentication"
+        AuthUserFile "/etc/auth-basic/htpasswd"
+        Require valid-user
+
+        Order allow,deny
+        Allow from all
+
+        ProxyPass        http://localhost:8080/ retry=0 timeout=3600
+        ProxyPassReverse http://localhost:8080/
+    </Location>
+
+    <Location "/grafana">
+        AuthType Basic
+        AuthName "Authentication"
+        AuthUserFile "/etc/auth-basic/htpasswd"
+        Require valid-user
+
+        Order allow,deny
+        Allow from all
+
+        ProxyPass        http://localhost:3000 retry=0 timeout=3600
+        ProxyPassReverse http://localhost:3000
+    </Location>
+
+    BrowserMatch "MSIE [2-6]" \
+            nokeepalive ssl-unclean-shutdown \
+            downgrade-1.0 force-response-1.0
+    BrowserMatch "MSIE [7-9]" ssl-unclean-shutdown
+
+</VirtualHost>
+```
+
+### Nginx
+
+With Nginx you can add a server to your server configuration file. In Debian based distributions (Ubuntu, openHABian, Raspbian) the enabled sites are usually stored in `/etc/nginx/sites-enabled`.
+
+```
+server {
+    listen                          443 ssl;
+    server_name                     _;
+
+    ssl_certificate                 /etc/ssl-certs/domain.com/fullchain.pem;
+    ssl_certificate_key             /etc/ssl-certs/domain.com/privkey.pem;
+
+    auth_basic                      "Username and Password Required";
+    auth_basic_user_file            /etc/auth-basic/htpasswd;
+
+    location / {
+        proxy_pass                            http://localhost:8080/;
+        proxy_set_header Host                 $http_host;
+        proxy_set_header X-Real-IP            $remote_addr;
+        proxy_set_header X-Forwarded-For      $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto    $scheme;
+    }
+
+    location /grafana/ {
+        proxy_pass http://localhost:3000/;
+    }
+}
+```
