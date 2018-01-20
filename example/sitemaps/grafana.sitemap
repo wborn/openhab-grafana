@@ -60,7 +60,7 @@ sitemap grafana label="Grafana examples"
 				Switch item=Render2_Panel mappings=[1="CPU", 2="Memory", 3="Storage", 4="Speedtest"]
 				Switch item=Render2_Width mappings=[200="200",600="600",1000="1000", auto="Auto"]
 				Switch item=Render2_Height mappings=[100="100",200="200",400="400", auto="Auto"]
-				Switch item=Render2_Render mappings=[false="False", true="True"]
+				Switch item=Render2_Render mappings=["false"="False", "true"="True"]
 				Selection item=Render2_Refresh mappings=[0="Off", 1000="1 second", 5000="5 seconds", 15000="15 seconds", 60000="1 minute", 300000="5 minutes", 900000="15 minutes", 3600000="1 hour"]
 				Webview url="/static/demo.html?dashboard=network&dashboardItem=Render2_Dashboard&from=now-1d&to=now&panelItem=Render2_Panel&widthItem=Render2_Width&heightItem=Render2_Height&renderItem=Render2_Render&refreshItem=Render2_Refresh" height=9
 			}
