@@ -37,7 +37,6 @@ var
     };
 
 function queryParams(param) {
-
     if (!param) {
         return {};
     }
@@ -78,7 +77,6 @@ function resolveParam(params, name) {
 }
 
 function SmartHomeSubscriber(params) {
-
     var
         p = params,
         initialized = false,
@@ -95,7 +93,7 @@ function SmartHomeSubscriber(params) {
             throw new Error("addItemListener 'listener' is not a function");
         }
         if (items[itemName] !== undefined) {
-            if( !items[itemName].listeners.includes(listener) ) {
+            if (!items[itemName].listeners.includes(listener)) {
                 items[itemName].listeners.push(listener);
             }
         } else {
@@ -173,7 +171,6 @@ function SmartHomeSubscriber(params) {
     }
 
     function updateItem(itemName, value) {
-
         if (items[itemName].value === value) {
             return;
         }
@@ -230,7 +227,6 @@ function SmartHomeSubscriber(params) {
     }
 
     function ChangeListenerLongpolling() {
-
         var
             _t = this;
 
@@ -382,7 +378,6 @@ function SmartHomeSubscriber(params) {
 var smartHomeSubscriber = new SmartHomeSubscriber();
 
 function GrafanaPanel(params) {
-
     var
         p = params,
         refreshTimerId = undefined,
