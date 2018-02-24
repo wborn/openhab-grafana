@@ -95,7 +95,9 @@ function SmartHomeSubscriber(params) {
             throw new Error("addItemListener 'listener' is not a function");
         }
         if (items[itemName] !== undefined) {
-            items[itemName].listeners.push(listener);
+            if( !items[itemName].listeners.includes(listener) ) {
+                items[itemName].listeners.push(listener);
+            }
         } else {
             items[itemName] = {listeners: [listener], value: undefined};
         }
