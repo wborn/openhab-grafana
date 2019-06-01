@@ -2,6 +2,8 @@
 
 This project provides a JavaScript library with examples to simplify embedding [Grafana](https://grafana.net) panels in [openHAB 2](http://www.openhab.org) (OH) and its derivatives.
 
+<img align="right" width="220" src="doc/logo.png" />
+
 The library provides the following functionality:
 
 * Generation of Grafana embedded panel URL parameters based on the state of OH items (using REST and subscribing to [Server-sent events (SSE)](https://en.wikipedia.org/wiki/Server-sent_events))
