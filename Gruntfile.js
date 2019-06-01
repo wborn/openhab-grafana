@@ -10,8 +10,8 @@ module.exports = function(grunt) {
 
 		clean: {
 			all: [
-				"example/html/smarthome-grafana.js",
-				"web/smarthome-grafana.js",
+				"example/html/openhab-grafana.js",
+				"web/openhab-grafana.js",
 			]
 		},
 
@@ -19,14 +19,14 @@ module.exports = function(grunt) {
 			options: {
 				configFile: "eslint.json"
 			},
-			target: ["web-src/smarthome-grafana.js"]
+			target: ["web-src/openhab-grafana.js"]
 		},
 
 		uglify: {
 			all: {
 				files: {
-					"example/html/smarthome-grafana.js": ["web-src/smarthome-grafana.js"],
-					"web/smarthome-grafana.js": ["web-src/smarthome-grafana.js"]
+					"example/html/openhab-grafana.js": ["web-src/openhab-grafana.js"],
+					"web/openhab-grafana.js": ["web-src/openhab-grafana.js"]
 				}
 			}
 		}
