@@ -2,5 +2,7 @@
 .project
 .settings
 *.iml
+node
 node_modules
-
+npm_cache
+target

@@ -1,4 +1,8 @@
-# openhab-grafana [![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT) [![Releases](https://img.shields.io/github/release/wborn/openhab-grafana.svg)](https://github.com/wborn/openhab-grafana/releases)
+# openhab-grafana
+
+[![Build Status](https://img.shields.io/travis/com/wborn/openhab-grafana.svg)](https://travis-ci.com/wborn/openhab-grafana)
+[![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/wborn/openhab-grafana/blob/master/LICENSE)
+[![Releases](https://img.shields.io/github/release/wborn/openhab-grafana.svg)](https://github.com/wborn/openhab-grafana/releases)
 
 This project provides a JavaScript library with examples to simplify embedding [Grafana](https://grafana.net) panels in [openHAB 2](http://www.openhab.org) (OH) and its derivatives.
 
@@ -105,11 +109,6 @@ These parameters can be manually added to the browser URL when showing the page 
 ## Grafana time units
 
 The Grafana [documentation](http://docs.grafana.org/reference/timerange/#time-units) has an overview with the time units that can be used with the `from=` and `to=` URL values.
-
-
-## Building
-
-Use [Grunt](http://gruntjs.com) to check the library code with eslint and minify it.
 
 
 ## Demo
@@ -409,4 +408,34 @@ server {
         proxy_pass http://localhost:3000/;
     }
 }
+```
+
+
+## Development
+
+The JavaScript files in the repository are ready to be used with openHAB.
+When modifying the library JavaScript code, use [Gulp](https://gulpjs.com/) for [linting](https://en.wikipedia.org/wiki/Lint_(software)) the code with [ESLint](https://eslint.org/) and to [minify](https://en.wikipedia.org/wiki/Minification_(programming)) it after making changes.
+
+### Debian/Ubuntu
+
+Node, NPM and Gulp can be installed using APT:
+
+```shell
+sudo apt install npm gulp
+```
+
+Open a shell and change the working directory (cd) to the root of the repository and execute:
+
+```shell
+npm install
+gulp
+```
+
+### Maven
+
+Alternatively there is a POM file in the repository which can be used for downloading Node, NPM and to run Gulp when Java and Maven are installed.
+Open a shell and change the working directory (cd) to the root of the repository and execute:
+
+```shell
+mvn clean package
 ```
