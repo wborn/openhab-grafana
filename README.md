@@ -2,9 +2,10 @@
 
 [![Build Status](https://img.shields.io/travis/com/wborn/openhab-grafana.svg)](https://travis-ci.com/wborn/openhab-grafana)
 [![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/wborn/openhab-grafana/blob/master/LICENSE)
+[![Current](https://img.shields.io/github/package-json/v/wborn/openhab-grafana.svg)](https://github.com/wborn/openhab-grafana)
 [![Releases](https://img.shields.io/github/release/wborn/openhab-grafana.svg)](https://github.com/wborn/openhab-grafana/releases)
 
-This project provides a JavaScript library with examples to simplify embedding [Grafana](https://grafana.net) panels in [openHAB 2](http://www.openhab.org) (OH) and its derivatives.
+This project provides a JavaScript library with examples to simplify embedding [Grafana](https://grafana.net) panels in [openHAB 2](https://www.openhab.org) (OH) and its derivatives.
 
 <img align="right" width="220" src="doc/logo.png" />
 
@@ -108,7 +109,7 @@ These parameters can be manually added to the browser URL when showing the page 
 
 ## Grafana time units
 
-The Grafana [documentation](http://docs.grafana.org/reference/timerange/#time-units) has an overview with the time units that can be used with the `from=` and `to=` URL values.
+The Grafana [documentation](https://docs.grafana.org/reference/timerange/#time-units) has an overview with the time units that can be used with the `from=` and `to=` URL values.
 
 
 ## Demo
