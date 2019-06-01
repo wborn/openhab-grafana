@@ -1,8 +1,8 @@
 /**
- * SmartHome Grafana panel utilities
+ * openHAB Grafana panel utilities
  *
- * Updates the source URL of Grafana <iframe> panels using Eclipse SmartHome server side events (SSE).
- * SmartHomeSubscriber is based on the javascript of the Eclipse SmartHome Basic UI by Vlad Ivanov.
+ * Updates the source URL of Grafana <iframe> panels using openHAB server side events (SSE).
+ * OHSubscriber is based on the javascript of the openHAB Basic UI by Vlad Ivanov.
  *
  * @author Wouter Born
  */
@@ -16,12 +16,12 @@
 "use strict";
 
 var
-    SMARTHOME_GRAFANA_DEFAULTS = {
+    OHG_DEFAULTS = {
         // library
         debug: "false",
         render: "false",
         refresh: "0",
-        // ESH sitemap
+        // OH sitemap
         sitemap: "default",
         // Grafana URL
         urlPrefix: "http://grafana:3000",
@@ -72,11 +72,11 @@ function resolveParam(params, name) {
     } else if (parentUrlParams !== undefined && parentUrlParams[name] !== undefined) {
         return parentUrlParams[name];
     } else {
-        return SMARTHOME_GRAFANA_DEFAULTS[name];
+        return OHG_DEFAULTS[name];
     }
 }
 
-function SmartHomeSubscriber(params) {
+function OHSubscriber(params) {
     var
         p = params,
         initialized = false,
@@ -375,7 +375,7 @@ function SmartHomeSubscriber(params) {
     initialize();
 }
 
-var smartHomeSubscriber = new SmartHomeSubscriber();
+var ohSubscriber = new OHSubscriber();
 
 function GrafanaPanel(params) {
     var
@@ -529,7 +529,7 @@ function GrafanaPanel(params) {
         updateVarsOnItemUpdate(libVars, itemName, value);
         updateVarsOnItemUpdate(urlVars, itemName, value);
 
-        if (smartHomeSubscriber.isInitialized()) {
+        if (ohSubscriber.isInitialized()) {
             updateFrameSourceURL();
         }
     }
@@ -540,11 +540,11 @@ function GrafanaPanel(params) {
         }
     }
 
-    function assertVarsDefinedOrSubscribeToESH(vars) {
+    function assertVarsDefinedOrSubscribeToOH(vars) {
         for (var key in vars) {
             var itemName = vars[key].itemName;
             if (itemName !== undefined) {
-                smartHomeSubscriber.addItemListener(itemName, onItemUpdated);
+                ohSubscriber.addItemListener(itemName, onItemUpdated);
             } else if (vars[key].value === undefined) {
                 throw new Error("Property '" + key + "' requires a default value or itemName to obtain the value from");
             }
@@ -557,10 +557,10 @@ function GrafanaPanel(params) {
         assertPropertyDefined("panelPath", panelPath);
         assertPropertyDefined("renderPanelPath", renderPanelPath);
 
-        assertVarsDefinedOrSubscribeToESH(libVars);
-        assertVarsDefinedOrSubscribeToESH(urlVars);
+        assertVarsDefinedOrSubscribeToOH(libVars);
+        assertVarsDefinedOrSubscribeToOH(urlVars);
 
-        smartHomeSubscriber.addInitializedListener(updateFrameSourceURL);
+        ohSubscriber.addInitializedListener(updateFrameSourceURL);
         window.addEventListener("resize", updateFrameOnResize);
     }
 
