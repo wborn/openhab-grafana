@@ -1,7 +1,7 @@
 # openhab-grafana
 
-[![Build Status](https://github.com/wborn/openhab-grafana/workflows/build%20library/badge.svg?event=push)](https://github.com/wborn/openhab-grafana/actions?query=workflow%3a%22build+library%22+event%3apush+branch%3amaster)
-[![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/wborn/openhab-grafana/blob/master/LICENSE)
+[![Build Status](https://github.com/wborn/openhab-grafana/workflows/build%20library/badge.svg?event=push)](https://github.com/wborn/openhab-grafana/actions?query=workflow%3a%22build+library%22+event%3apush+branch%3amain)
+[![MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/wborn/openhab-grafana/blob/main/LICENSE)
 [![Current](https://img.shields.io/github/package-json/v/wborn/openhab-grafana.svg)](https://github.com/wborn/openhab-grafana)
 [![Releases](https://img.shields.io/github/release/wborn/openhab-grafana.svg)](https://github.com/wborn/openhab-grafana/releases)
 
