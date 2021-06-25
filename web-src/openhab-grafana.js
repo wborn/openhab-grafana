@@ -25,8 +25,8 @@ var
         sitemap: "default",
         // Grafana URL
         urlPrefix: "http://grafana:3000",
-        panelPath: "/dashboard-solo/db/",
-        renderPanelPath: "/render/dashboard-solo/db/",
+        panelPath: "/d/",
+        renderPanelPath: "/d/",
         // Grafana panel parameters
         from: "now-1d",
         to: "now",
@@ -422,7 +422,7 @@ function GrafanaPanel(params) {
                 itemFunction: params.toItemFunction
             },
             panel: {
-                key: "panelId",
+                key: "viewPanel",
                 value: resolveParam(p, "panel"),
                 itemName: resolveParam(p, "panelItem"),
                 itemFunction: params.panelItemFunction
@@ -475,6 +475,8 @@ function GrafanaPanel(params) {
                 firstParameter = false;
             }
         }
+        
+        url += "&" + "kiosk=1";
 
         if (render === "true") {
             // append cache busting parameter
