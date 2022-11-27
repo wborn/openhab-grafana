@@ -22,7 +22,7 @@ The resulting sitemaps have less duplication and page load times decrease becaus
 ## Requirements
 
 * openHAB (OH) installation, e.g. follow: https://www.openhab.org/docs/installation/
-* Grafana installation/configuration, e.g. follow: https://community.openhab.org/t/influxdb-grafana-persistence-and-graphing/13761
+* Grafana 8 (or newer) installation/configuration, e.g. follow: https://community.openhab.org/t/influxdb-grafana-persistence-and-graphing/13761
 * **OH and Grafana accessible via the same host/port to prevent [Same-origin policy](https://en.wikipedia.org/wiki/Same-origin_policy) violations.** E.g. setup a reverse proxy using the [configuration examples](#reverse-proxy-configuration) below.
 
 

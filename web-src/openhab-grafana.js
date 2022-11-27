@@ -25,8 +25,8 @@ var
         sitemap: "default",
         // Grafana URL
         urlPrefix: "http://grafana:3000",
-        panelPath: "/dashboard-solo/db/",
-        renderPanelPath: "/render/dashboard-solo/db/",
+        panelPath: "/d-solo/",
+        renderPanelPath: "/render/d-solo/",
         // Grafana panel parameters
         from: "now-1d",
         to: "now",
